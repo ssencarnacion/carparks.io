@@ -19,7 +19,7 @@ WiFiClient client;
 #define ECHO_PIN_2 D8
 
 // Distance threshold for parking occupancy
-#define MAX_OCCUPIED_CM 50
+#define MAX_OCCUPIED_CM 200
 #define MIN_OCCUPIED_CM 0
 
 void setup() {

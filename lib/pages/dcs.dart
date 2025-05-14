@@ -64,7 +64,7 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
     super.dispose();
   }
 
-  // Check if the value of a field is exceeds to 200.00000cm (no detected object: FREE!)
+  // Check if the value of a field is exceeds to 200.00000 cm (no detected object: FREE!)
   bool isAvailable(String? value) {
     if (value == null) return false;
 

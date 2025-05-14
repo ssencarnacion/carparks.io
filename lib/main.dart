@@ -40,7 +40,7 @@ class _SearchPageState extends State<SearchPage> {
   bool _tapped = false;
   Timer? timer;
 
-  // list of connected parking lots
+  // List of connected parking lots
   List<Map<String, dynamic>> _parkingLots = [
     {
       'id': 'dcs',
@@ -61,7 +61,7 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     super.initState();
-    //TODO: make the updating get API key as input, to make it more modular
+    // TODO: make the updating get API key as input, to make it more modular
     updateDcsSlots();
     timer = Timer.periodic(const Duration(seconds: 5), (_) => updateDcsSlots());
   }
@@ -72,7 +72,7 @@ class _SearchPageState extends State<SearchPage> {
     super.dispose();
   }
 
-  // get DCS parking slot data from the cloud
+  // Get DCS parking slot data from the cloud
   void updateDcsSlots() async {
     final slots = await fetchDcsSlots();
     setState(() {
