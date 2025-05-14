@@ -1,7 +1,10 @@
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'pages/dcs.dart';
-import 'pages/eeei.dart';
-
+import 'pages/info.dart';
+import 'pages/slot_service.dart';
 void main() {
   runApp(const CarParksApp());
 }
@@ -35,21 +38,55 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController _controller = TextEditingController();
   bool _tapped = false;
+  Timer? timer;
 
-  final List<Map<String, dynamic>> _parkingLots = [
+  // list of connected parking lots
+  List<Map<String, dynamic>> _parkingLots = [
     {
+      'id': 'dcs',
       'name': 'DCS Parking Lot',
       'address': 'Velasquez St, UP Campus, Diliman, Quezon City',
-      'slots': '16/16',
+      'slots': 'Loading...',
       'page': const DCSParkingLotPage(),
     },
     {
-      'name': 'EEEI Parking Lot',
-      'address': 'Velasquez St, UP Campus, Diliman, Quezon City',
-      'slots': '32/32',
-      'page': const EEEIParkingLotPage(),
+      'id': 'info',
+      'name': 'Info Page',
+      'address': 'Check sensor information',
+      'slots': 'n/n',
+      'page': const InfoPage(),
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    //TODO: make the updating get API key as input, to make it more modular
+    updateDcsSlots();
+    timer = Timer.periodic(const Duration(seconds: 5), (_) => updateDcsSlots());
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  // get DCS parking slot data from the cloud
+  void updateDcsSlots() async {
+    final slots = await fetchDcsSlots();
+    setState(() {
+      _parkingLots = _parkingLots.map((lot) {
+        if (lot['id'] == 'dcs') {
+          return {
+            ...lot,
+            'slots': slots,
+          };
+        }
+        return lot;
+      }).toList();
+    });
+  }
 
   List<Map<String, dynamic>> get _filteredLots {
     final query = _controller.text.toLowerCase();
@@ -120,12 +157,14 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                         trailing: Text(
                           '${lot['slots']} Slots left',
-                          style: const TextStyle(color: Colors.greenAccent),
+                          style:
+                          const TextStyle(color: Colors.greenAccent),
                         ),
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => lot['page']),
+                            MaterialPageRoute(
+                                builder: (_) => lot['page']),
                           );
                         },
                       ),

@@ -2,23 +2,25 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'slot_service.dart';
 
-class EEEIParkingLotPage extends StatefulWidget {
-  const EEEIParkingLotPage({super.key});
+class InfoPage extends StatefulWidget {
+  const InfoPage({super.key});
 
   @override
-  State<EEEIParkingLotPage> createState() => _EEEIParkingLotPageState();
+  State<InfoPage> createState() => _InfoPageState();
 }
 
-class _EEEIParkingLotPageState extends State<EEEIParkingLotPage> {
+class _InfoPageState extends State<InfoPage> {
   Map<String, String>? data;
+  String? availableSlots;
   Timer? timer;
 
   @override
   void initState() {
     super.initState();
     fetchData();
-    timer = Timer.periodic(const Duration(seconds: 15), (_) => fetchData());
+    timer = Timer.periodic(const Duration(seconds: 5), (_) => fetchData());
   }
 
   Future<void> fetchData() async {
@@ -31,15 +33,19 @@ class _EEEIParkingLotPageState extends State<EEEIParkingLotPage> {
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         final feed = jsonData['feeds'][0];
+
+        // Fetch slot data from slot_service
+        final slots = await fetchDcsSlots();
+
         setState(() {
           data = {
             'field1': feed['field1'] ?? 'N/A',
             'field2': feed['field2'] ?? 'N/A',
           };
+          availableSlots = slots;
         });
       }
     } catch (e) {
-     
     }
   }
 
@@ -54,7 +60,7 @@ class _EEEIParkingLotPageState extends State<EEEIParkingLotPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF0E0F19),
       appBar: AppBar(
-        title: const Text('EEEI Parking Lot'),
+        title: const Text('Information Page'),
         centerTitle: true,
         backgroundColor: Colors.transparent,
       ),
@@ -72,6 +78,11 @@ class _EEEIParkingLotPageState extends State<EEEIParkingLotPage> {
             Text(
               'Distance 2: ${data!['field2']} cm',
               style: const TextStyle(fontSize: 24, color: Colors.white),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Available Slots: ${availableSlots ?? "Loading..."}',
+              style: const TextStyle(fontSize: 24),
             ),
           ],
         ),
