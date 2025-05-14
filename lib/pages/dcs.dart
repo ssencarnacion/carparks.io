@@ -64,10 +64,16 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
     super.dispose();
   }
 
-  // Check if the value of a field is equal to 999.00000 (no detected object: FREE!)
+  // Check if the value of a field is exceeds to 200.00000cm (no detected object: FREE!)
   bool isAvailable(String? value) {
-    return value == "999.00000";
+    if (value == null) return false;
+
+    final parsedValue = double.tryParse(value);
+    if (parsedValue == null) return false;
+
+    return parsedValue >= 200;
   }
+
 
   @override
   Widget build(BuildContext context) {

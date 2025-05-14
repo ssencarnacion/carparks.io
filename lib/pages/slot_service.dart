@@ -18,8 +18,8 @@ Future<String> fetchDcsSlots() async {
       feed.forEach((key, value) {
         if (key.startsWith('field')) {
           total++;
-          final distance = double.tryParse(value ?? '') ?? 0.0;
-          if (distance >= 999.0) available++;
+          final distance = double.tryParse(value ?? '') ?? 0.0; //if reading exceeds 200cm (or 999cm : no reading), it means parking space is free
+          if (distance >= 200.0) available++;
         }
       });
 
