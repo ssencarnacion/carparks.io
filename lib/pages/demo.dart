@@ -3,17 +3,16 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class DCSParkingLotPage extends StatefulWidget {
-  const DCSParkingLotPage({super.key});
+class DemoParkingLotPage extends StatefulWidget {
+  const DemoParkingLotPage({super.key});
 
   @override
-  State<DCSParkingLotPage> createState() => _DCSParkingLotPageState();
+  State<DemoParkingLotPage> createState() => _DemoParkingLotPageState();
 }
 
-class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
-  // Add connected sensor fields
-  String? field1; // A6
-  String? field2; // A5
+class _DemoParkingLotPageState extends State<DemoParkingLotPage> {
+  String? field1; // A1
+  String? field2; // A2
 
   int availableSlots = 0;
   bool isLoading = true;
@@ -64,7 +63,6 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
     super.dispose();
   }
 
-  // Check if the value of a field exceeds 200.00000 cm (reading is >= 200cm: FREE SLOT!)
   bool isAvailable(String? value) {
     if (value == null) return false;
 
@@ -73,7 +71,6 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
 
     return parsedValue >= 200;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +91,7 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
           child: Column(
             children: [
               const Text(
-                'DCS',
+                'Demo',
                 style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
@@ -108,41 +105,38 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               Expanded(
                 child: Row(
                   children: [
+                    // A1 slot
                     Expanded(
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: List.generate(8, (index) {
-                          final slotNumber = 8 - index; // A8 to A1
-                          return _buildParkingSlot('A$slotNumber');
-                        }),
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildParkingSlot('A1'),
+                        ],
                       ),
                     ),
-                    Column(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            width: 1,
-                            color: Colors.white54,
-                          ),
-                        ),
-                      ],
+                    // Divider
+                    Container(
+                      width: 2,
+                      color: Colors.white54,
+                      height: double.infinity,
                     ),
+                    // A2 slot
                     Expanded(
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: List.generate(8, (index) {
-                          final slotNumber = index + 9; // A9 to A16
-                          return _buildParkingSlot('A$slotNumber');
-                        }),
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildParkingSlot('A2'),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 40),
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 decoration: BoxDecoration(
@@ -194,44 +188,31 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
     Color slotColor = Colors.grey;
     String contentText = slotName;
 
-    // Variable slot color according to availability
     if (!isLoading) {
-      if (slotName == "A5") {
-        slotColor = isAvailable(field2) ? Colors.green : Colors.red;
-      } else if (slotName == "A6") {
+      if (slotName == "A1") {
         slotColor = isAvailable(field1) ? Colors.green : Colors.red;
+      } else if (slotName == "A2") {
+        slotColor = isAvailable(field2) ? Colors.green : Colors.red;
       }
     }
 
-    return Column(
-      children: [
-        Container(
-          width: 80,
-          height: 40,
-          decoration: BoxDecoration(
-            color: slotColor,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Center(
-            child: Text(
-              contentText,
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+    return Container(
+      width: 120,
+      height: 100,
+      decoration: BoxDecoration(
+        color: slotColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Center(
+        child: Text(
+          contentText,
+          style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
           ),
         ),
-        if (slotName != "A1" && slotName != "A16")
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Container(
-              width: 80,
-              height: 1,
-              color: Colors.white30,
-            ),
-          ),
-      ],
+      ),
     );
   }
 }

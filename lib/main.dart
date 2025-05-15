@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'pages/dcs.dart';
+import 'pages/demo.dart';
 import 'pages/info.dart';
 import 'pages/slot_service.dart';
 void main() {
@@ -43,6 +44,13 @@ class _SearchPageState extends State<SearchPage> {
   // List of connected parking lots
   List<Map<String, dynamic>> _parkingLots = [
     {
+      'id': 'demo',
+      'name': 'Demo Parking Lot',
+      'address': 'Dragons\' Den Exhibition',
+      'slots': 'Loading...',
+      'page': const DemoParkingLotPage(),
+    },
+    {
       'id': 'dcs',
       'name': 'DCS Parking Lot',
       'address': 'Velasquez St, UP Campus, Diliman, Quezon City',
@@ -75,18 +83,16 @@ class _SearchPageState extends State<SearchPage> {
   // Get DCS parking slot data from the cloud
   void updateDcsSlots() async {
     final slots = await fetchDcsSlots();
+
     setState(() {
-      _parkingLots = _parkingLots.map((lot) {
-        if (lot['id'] == 'dcs') {
-          return {
-            ...lot,
-            'slots': slots,
-          };
+      for (var lot in _parkingLots) {
+        if (lot['id'] == 'dcs' || lot['id'] == 'demo') {
+          lot['slots'] = slots;
         }
-        return lot;
-      }).toList();
+      }
     });
   }
+
 
   List<Map<String, dynamic>> get _filteredLots {
     final query = _controller.text.toLowerCase();
