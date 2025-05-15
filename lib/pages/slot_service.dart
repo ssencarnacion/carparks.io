@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-// Service for DCS parking slots, TODO: make it more general-purpose
-// probably just ask for the API_key instead of making 1 for every parking lot
-Future<String> fetchDcsSlots() async {
+
+Future<Map<String, dynamic>> getSlotAvailability({
+  required String apiKey,
+  required String channelId,
+  int resultIndex = 1, // Get the latest reading
+}) async {
   final url = Uri.parse(
-      'https://api.thingspeak.com/channels/2945987/feeds.json?api_key=HNVUWEWNDFYKOWBA&results=1');
+    'https://api.thingspeak.com/channels/$channelId/feeds.json?api_key=$apiKey&results=$resultIndex',
+  );
 
   try {
     final response = await http.get(url);
@@ -14,19 +18,29 @@ Future<String> fetchDcsSlots() async {
 
       int available = 0;
       int total = 0;
+      List<String> availableFields = [];
 
       feed.forEach((key, value) {
         if (key.startsWith('field')) {
           total++;
-          final distance = double.tryParse(value ?? '') ?? 0.0; //if reading exceeds 200cm (or 999cm : no reading), it means parking space is free
-          if (distance >= 200.0) available++;
+          final distance = double.tryParse(value ?? '') ?? 0.0;
+          if (distance >= 200) { // We interpret this as a slot being free (accounts for timeouts: 999cm) *LIMITATION: we cannot check which sensors have broken down yet
+            available++; // Count available slots
+            availableFields.add(key); // Track available field
+          }
         }
       });
 
-      return '$available/$total';
+      return {
+        'summary': '$available/$total',
+        'availableFields': availableFields,
+      };
     }
   } catch (e) {
   }
 
-  return '0';
+  return {
+    'summary': '0',
+    'availableFields': [],
+  };
 }

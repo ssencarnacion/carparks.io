@@ -35,14 +35,17 @@ class _InfoPageState extends State<InfoPage> {
         final feed = jsonData['feeds'][0];
 
         // Fetch slot data from slot_service
-        final slots = await fetchDcsSlots();
+        final slots = await getSlotAvailability(
+          apiKey: 'HNVUWEWNDFYKOWBA',
+          channelId: '2945987',
+        );
 
         setState(() {
           data = {
             'field1': feed['field1'] ?? 'N/A',
             'field2': feed['field2'] ?? 'N/A',
           };
-          availableSlots = slots;
+          availableSlots = slots['summary'];
         });
       }
     } catch (e) {

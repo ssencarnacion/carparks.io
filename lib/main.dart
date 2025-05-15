@@ -42,6 +42,7 @@ class _SearchPageState extends State<SearchPage> {
   Timer? timer;
 
   // List of connected parking lots
+  // change apiKey and channelId as necessary
   List<Map<String, dynamic>> _parkingLots = [
     {
       'id': 'demo',
@@ -49,6 +50,8 @@ class _SearchPageState extends State<SearchPage> {
       'address': 'Dragons\' Den Exhibition',
       'slots': 'Loading...',
       'page': const DemoParkingLotPage(),
+      'apiKey': 'HNVUWEWNDFYKOWBA',
+      'channelId': '2945987',
     },
     {
       'id': 'dcs',
@@ -56,8 +59,11 @@ class _SearchPageState extends State<SearchPage> {
       'address': 'Velasquez St, UP Campus, Diliman, Quezon City',
       'slots': 'Loading...',
       'page': const DCSParkingLotPage(),
+      'apiKey': 'HNVUWEWNDFYKOWBA',
+      'channelId': '2945987',
     },
     {
+      //debug page
       'id': 'info',
       'name': 'Info Page',
       'address': 'Check sensor information',
@@ -69,9 +75,8 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     super.initState();
-    // TODO: make the updating get API key as input, to make it more modular
-    updateDcsSlots();
-    timer = Timer.periodic(const Duration(seconds: 5), (_) => updateDcsSlots());
+    updateParkingSlots();
+    timer = Timer.periodic(const Duration(seconds: 5), (_) => updateParkingSlots());
   }
 
   @override
@@ -80,19 +85,24 @@ class _SearchPageState extends State<SearchPage> {
     super.dispose();
   }
 
-  // Get DCS parking slot data from the cloud
-  void updateDcsSlots() async {
-    final slots = await fetchDcsSlots();
+  // Get parking slot data from the cloud
+  void updateParkingSlots() async {
+    for (var lot in _parkingLots) {
+      if (lot['id'] == 'dcs' || lot['id'] == 'demo') {
+        final apiKey = lot['apiKey'];
+        final channelId = lot['channelId'];
 
-    setState(() {
-      for (var lot in _parkingLots) {
-        if (lot['id'] == 'dcs' || lot['id'] == 'demo') {
-          lot['slots'] = slots;
-        }
+        final slots = await getSlotAvailability(
+          apiKey: apiKey,
+          channelId: channelId,
+        );
+
+        setState(() {
+          lot['slots'] = slots['summary'];
+        });
       }
-    });
+    }
   }
-
 
   List<Map<String, dynamic>> get _filteredLots {
     final query = _controller.text.toLowerCase();

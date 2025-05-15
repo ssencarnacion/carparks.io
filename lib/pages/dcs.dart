@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
+import 'slot_service.dart';
 class DCSParkingLotPage extends StatefulWidget {
   const DCSParkingLotPage({super.key});
 
@@ -11,11 +11,8 @@ class DCSParkingLotPage extends StatefulWidget {
 }
 
 class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
-  // Add connected sensor fields
-  String? field1; // A6
-  String? field2; // A5
-
-  int availableSlots = 0;
+  List<String> availableFields = [];
+  String? availableSlots;
   bool isLoading = true;
   Timer? timer;
 
@@ -27,30 +24,16 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
   }
 
   Future<void> fetchData() async {
-    final url = Uri.parse(
-      'https://api.thingspeak.com/channels/2945987/feeds.json?api_key=HNVUWEWNDFYKOWBA&results=1',
-    );
-
     try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        final feed = jsonData['feeds'][0];
-
-        final String? f1 = feed['field1'];
-        final String? f2 = feed['field2'];
-
-        int count = 0;
-        if (isAvailable(f1)) count++;
-        if (isAvailable(f2)) count++;
-
-        setState(() {
-          field1 = f1 ?? 'N/A';
-          field2 = f2 ?? 'N/A';
-          availableSlots = count;
-          isLoading = false;
-        });
-      }
+      final result = await getSlotAvailability(
+        apiKey: 'HNVUWEWNDFYKOWBA',
+        channelId: '2945987',
+      );
+      setState(() {
+        availableSlots = result['summary'];
+        availableFields = result['availableFields'];
+        isLoading = false;
+      });
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -63,17 +46,6 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
     timer?.cancel();
     super.dispose();
   }
-
-  // Check if the value of a field exceeds 200.00000 cm (reading is >= 200cm: FREE SLOT!)
-  bool isAvailable(String? value) {
-    if (value == null) return false;
-
-    final parsedValue = double.tryParse(value);
-    if (parsedValue == null) return false;
-
-    return parsedValue >= 200;
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +139,7 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
                   ),
                 )
                     : Text(
-                  '$availableSlots/2',
+                  '$availableSlots',
                   style: const TextStyle(
                     fontSize: 48,
                     fontWeight: FontWeight.bold,
@@ -195,12 +167,11 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
     String contentText = slotName;
 
     // Variable slot color according to availability
-    if (!isLoading) {
-      if (slotName == "A5") {
-        slotColor = isAvailable(field2) ? Colors.green : Colors.red;
-      } else if (slotName == "A6") {
-        slotColor = isAvailable(field1) ? Colors.green : Colors.red;
-      }
+    if (!isLoading && slotName.length > 1) {
+      final slotNumber = slotName.substring(1);
+      final fieldKey = 'field$slotNumber';
+      final isSlotAvailable = availableFields.contains(fieldKey);
+      slotColor = isSlotAvailable ? Colors.green : Colors.red;
     }
 
     return Column(

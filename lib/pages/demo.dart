@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
+import 'slot_service.dart';
 class DemoParkingLotPage extends StatefulWidget {
   const DemoParkingLotPage({super.key});
 
@@ -11,10 +11,8 @@ class DemoParkingLotPage extends StatefulWidget {
 }
 
 class _DemoParkingLotPageState extends State<DemoParkingLotPage> {
-  String? field1; // A1
-  String? field2; // A2
-
-  int availableSlots = 0;
+  List<String> availableFields = [];
+  String? availableSlots;
   bool isLoading = true;
   Timer? timer;
 
@@ -26,30 +24,16 @@ class _DemoParkingLotPageState extends State<DemoParkingLotPage> {
   }
 
   Future<void> fetchData() async {
-    final url = Uri.parse(
-      'https://api.thingspeak.com/channels/2945987/feeds.json?api_key=HNVUWEWNDFYKOWBA&results=1',
-    );
-
     try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        final feed = jsonData['feeds'][0];
-
-        final String? f1 = feed['field1'];
-        final String? f2 = feed['field2'];
-
-        int count = 0;
-        if (isAvailable(f1)) count++;
-        if (isAvailable(f2)) count++;
-
-        setState(() {
-          field1 = f1 ?? 'N/A';
-          field2 = f2 ?? 'N/A';
-          availableSlots = count;
-          isLoading = false;
-        });
-      }
+      final result = await getSlotAvailability(
+        apiKey: 'HNVUWEWNDFYKOWBA',
+        channelId: '2945987',
+      );
+      setState(() {
+        availableSlots = result['summary'];
+        availableFields = result['availableFields'];
+        isLoading = false;
+      });
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -57,19 +41,11 @@ class _DemoParkingLotPageState extends State<DemoParkingLotPage> {
     }
   }
 
+
   @override
   void dispose() {
     timer?.cancel();
     super.dispose();
-  }
-
-  bool isAvailable(String? value) {
-    if (value == null) return false;
-
-    final parsedValue = double.tryParse(value);
-    if (parsedValue == null) return false;
-
-    return parsedValue >= 200;
   }
 
   @override
@@ -161,7 +137,7 @@ class _DemoParkingLotPageState extends State<DemoParkingLotPage> {
                   ),
                 )
                     : Text(
-                  '$availableSlots/2',
+                  '$availableSlots',
                   style: const TextStyle(
                     fontSize: 48,
                     fontWeight: FontWeight.bold,
@@ -188,12 +164,12 @@ class _DemoParkingLotPageState extends State<DemoParkingLotPage> {
     Color slotColor = Colors.grey;
     String contentText = slotName;
 
-    if (!isLoading) {
-      if (slotName == "A1") {
-        slotColor = isAvailable(field1) ? Colors.green : Colors.red;
-      } else if (slotName == "A2") {
-        slotColor = isAvailable(field2) ? Colors.green : Colors.red;
-      }
+    // Variable slot color according to availability
+    if (!isLoading && slotName.length > 1) {
+      final slotNumber = slotName.substring(1);
+      final fieldKey = 'field$slotNumber';
+      final isSlotAvailable = availableFields.contains(fieldKey);
+      slotColor = isSlotAvailable ? Colors.green : Colors.red;
     }
 
     return Container(
