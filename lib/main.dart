@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'pages/dcs.dart';
 import 'pages/demo.dart';
 import 'pages/info.dart';
-import 'pages/slot_service.dart';
+import 'services/slot_service.dart';
 void main() {
   runApp(const CarParksApp());
 }
