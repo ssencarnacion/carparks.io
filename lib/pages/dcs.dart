@@ -167,7 +167,7 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
     String contentText = slotName;
 
     // Variable slot color according to availability
-    if (!isLoading && slotName.length > 1) {
+    if (!isLoading && (slotName == 'A1' || slotName == 'A2')) {
       final slotNumber = slotName.substring(1);
       final fieldKey = 'field$slotNumber';
       final isSlotAvailable = availableFields.contains(fieldKey);
