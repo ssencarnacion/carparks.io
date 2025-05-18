@@ -6,7 +6,14 @@ import 'pages/dcs.dart';
 import 'pages/demo.dart';
 import 'pages/info.dart';
 import 'services/slot_service.dart';
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+import 'services/firebase_options.dart';
+
+void main() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const CarParksApp());
 }
 
@@ -42,7 +49,7 @@ class _SearchPageState extends State<SearchPage> {
   Timer? timer;
 
   // List of connected parking lots
-  // change apiKey and channelId as necessary
+  // id refers to the Firebase node
   List<Map<String, dynamic>> _parkingLots = [
     {
       'id': 'demo',
@@ -50,8 +57,6 @@ class _SearchPageState extends State<SearchPage> {
       'address': 'Dragons\' Den Exhibition',
       'slots': 'Loading...',
       'page': const DemoParkingLotPage(),
-      'apiKey': 'HNVUWEWNDFYKOWBA',
-      'channelId': '2945987',
     },
     {
       'id': 'dcs',
@@ -59,8 +64,6 @@ class _SearchPageState extends State<SearchPage> {
       'address': 'Velasquez St, UP Campus, Diliman, Quezon City',
       'slots': 'Loading...',
       'page': const DCSParkingLotPage(),
-      'apiKey': 'HNVUWEWNDFYKOWBA',
-      'channelId': '2945987',
     },
     {
       //debug page
@@ -88,13 +91,10 @@ class _SearchPageState extends State<SearchPage> {
   // Get parking slot data from the cloud
   void updateParkingSlots() async {
     for (var lot in _parkingLots) {
-      if (lot['id'] == 'dcs' || lot['id'] == 'demo') {
-        final apiKey = lot['apiKey'];
-        final channelId = lot['channelId'];
-
+      if (lot['id'] == 'dcs' || lot['id'] == 'demo') { // This line should not exist in release versions
+        final id = 'demo'; // We only have the demo database for now, it should be final id = lot['id'];
         final slots = await getSlotAvailability(
-          apiKey: apiKey,
-          channelId: channelId,
+          id : id
         );
 
         setState(() {
