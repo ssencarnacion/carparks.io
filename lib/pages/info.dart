@@ -1,8 +1,5 @@
-import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import '../services/slot_service.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class InfoPage extends StatefulWidget {
   const InfoPage({super.key});
@@ -12,50 +9,22 @@ class InfoPage extends StatefulWidget {
 }
 
 class _InfoPageState extends State<InfoPage> {
-  Map<String, String>? data;
-  String? availableSlots;
-  Timer? timer;
+  final DatabaseReference _demoRef =
+  FirebaseDatabase.instance.ref().child('demo');
+
+  String field1 = 'Loading...';
+  String field2 = 'Loading...';
 
   @override
   void initState() {
     super.initState();
-    fetchData();
-    timer = Timer.periodic(const Duration(seconds: 5), (_) => fetchData());
-  }
-
-  Future<void> fetchData() async {
-    final url = Uri.parse(
-      'https://api.thingspeak.com/channels/2945987/feeds.json?api_key=HNVUWEWNDFYKOWBA&results=1',
-    );
-
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        final feed = jsonData['feeds'][0];
-
-        // Fetch slot data from slot_service
-        final slots = await getSlotAvailability(
-          apiKey: 'HNVUWEWNDFYKOWBA',
-          channelId: '2945987',
-        );
-
-        setState(() {
-          data = {
-            'field1': feed['field1'] ?? 'N/A',
-            'field2': feed['field2'] ?? 'N/A',
-          };
-          availableSlots = slots['summary'];
-        });
-      }
-    } catch (e) {
-    }
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
+    _demoRef.onValue.listen((event) {
+      final data = event.snapshot.value as Map<dynamic, dynamic>;
+      setState(() {
+        field1 = data['slot1'].toString();
+        field2 = data['slot2'].toString();
+      });
+    });
   }
 
   @override
@@ -63,30 +32,19 @@ class _InfoPageState extends State<InfoPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF0E0F19),
       appBar: AppBar(
-        title: const Text('Information Page'),
+        title: const Text('Realtime Data'),
+        backgroundColor: Colors.black,
         centerTitle: true,
-        backgroundColor: Colors.transparent,
       ),
       body: Center(
-        child: data == null
-            ? const CircularProgressIndicator()
-            : Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Distance 1: ${data!['field1']} cm',
-              style: const TextStyle(fontSize: 24, color: Colors.white),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Distance 2: ${data!['field2']} cm',
-              style: const TextStyle(fontSize: 24, color: Colors.white),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Available Slots: ${availableSlots ?? "Loading..."}',
-              style: const TextStyle(fontSize: 24),
-            ),
+            Text('Distance 1: $field1 cm',
+                style: const TextStyle(fontSize: 24, color: Colors.white)),
+            const SizedBox(height: 20),
+            Text('Distance 2: $field2 cm',
+                style: const TextStyle(fontSize: 24, color: Colors.white)),
           ],
         ),
       ),

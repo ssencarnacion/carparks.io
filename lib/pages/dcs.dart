@@ -26,8 +26,7 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
   Future<void> fetchData() async {
     try {
       final result = await getSlotAvailability(
-        apiKey: 'HNVUWEWNDFYKOWBA',
-        channelId: '2945987',
+       id: 'demo',
       );
       setState(() {
         availableSlots = result['summary'];
@@ -169,8 +168,8 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
     // Variable slot color according to availability
     if (!isLoading && (slotName == 'A1' || slotName == 'A2')) {
       final slotNumber = slotName.substring(1);
-      final fieldKey = 'field$slotNumber';
-      final isSlotAvailable = availableFields.contains(fieldKey);
+      final slotKey = 'slot$slotNumber';
+      final isSlotAvailable = availableFields.contains(slotKey);
       slotColor = isSlotAvailable ? Colors.green : Colors.red;
     }
 

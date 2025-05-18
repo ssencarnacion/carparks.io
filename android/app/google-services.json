@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "850944259113",
+    "firebase_url": "https://carparks-c719c-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "carparks-c719c",
+    "storage_bucket": "carparks-c719c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:850944259113:android:5d5127e3e21fa5c2ddd838",
+        "android_client_info": {
+          "package_name": "com.example.test_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLyjAqsWEuirarY5fkmAdDbmsnX6pkRYA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
