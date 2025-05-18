@@ -49,7 +49,7 @@ class _SearchPageState extends State<SearchPage> {
   Timer? timer;
 
   // List of connected parking lots
-  // change apiKey and channelId as necessary
+  // id refers to the Firebase node
   List<Map<String, dynamic>> _parkingLots = [
     {
       'id': 'demo',

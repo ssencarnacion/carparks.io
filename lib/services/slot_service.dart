@@ -1,9 +1,4 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 import 'package:firebase_database/firebase_database.dart';
-
 
 Future<Map<String, dynamic>> getSlotAvailability({
   required String id,
@@ -21,9 +16,9 @@ Future<Map<String, dynamic>> getSlotAvailability({
     if (key.toString().startsWith('slot')) {
       total++;
       final distance = double.tryParse(value.toString()) ?? 0.0;
-      if (distance >= 200) {
-        available++;
-        availableFields.add(key.toString());
+      if (distance >= 200) { // We interpret this as a slot being free (accounts for timeouts: 999cm)
+        available++; // Count available slots
+        availableFields.add(key.toString()); // Track all available slots
       }
     }
   });

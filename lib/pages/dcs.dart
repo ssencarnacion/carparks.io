@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import '../services/slot_service.dart';
+
 class DCSParkingLotPage extends StatefulWidget {
   const DCSParkingLotPage({super.key});
-
   @override
   State<DCSParkingLotPage> createState() => _DCSParkingLotPageState();
 }

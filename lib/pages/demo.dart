@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-
 import '../services/slot_service.dart';
 class DemoParkingLotPage extends StatefulWidget {
   const DemoParkingLotPage({super.key});
