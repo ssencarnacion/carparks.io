@@ -87,7 +87,7 @@ class _DemoParkingLotPageState extends State<DemoParkingLotPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _buildParkingSlot('A1'),
+                          _buildParkingSlot('A2'),
                         ],
                       ),
                     ),
@@ -102,7 +102,7 @@ class _DemoParkingLotPageState extends State<DemoParkingLotPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _buildParkingSlot('A2'),
+                          _buildParkingSlot('A1'),
                         ],
                       ),
                     ),
