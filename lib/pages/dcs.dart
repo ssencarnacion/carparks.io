@@ -9,8 +9,8 @@ class DCSParkingLotPage extends StatefulWidget {
 }
 
 class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
-  List<String> availableFields = [];
-  String? availableSlots;
+  List<String> availableSlots = [];
+  String? summary;
   bool isLoading = true;
   Timer? timer;
 
@@ -27,8 +27,8 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
        id: 'demo',
       );
       setState(() {
-        availableSlots = result['summary'];
-        availableFields = result['availableFields'];
+        summary = result['summary'];
+        availableSlots = result['availableSlots'];
         isLoading = false;
       });
     } catch (e) {
@@ -136,7 +136,7 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
                   ),
                 )
                     : Text(
-                  '$availableSlots',
+                  '$summary',
                   style: const TextStyle(
                     fontSize: 48,
                     fontWeight: FontWeight.bold,
@@ -164,10 +164,11 @@ class _DCSParkingLotPageState extends State<DCSParkingLotPage> {
     String contentText = slotName;
 
     // Variable slot color according to availability
+
     if (!isLoading && (slotName == 'A1' || slotName == 'A2')) {
       final slotNumber = slotName.substring(1);
       final slotKey = 'slot$slotNumber';
-      final isSlotAvailable = availableFields.contains(slotKey);
+      final isSlotAvailable = availableSlots.contains(slotKey);
       slotColor = isSlotAvailable ? Colors.green : Colors.red;
     }
 

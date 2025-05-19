@@ -50,7 +50,7 @@ class _SearchPageState extends State<SearchPage> {
 
   // List of connected parking lots
   // id refers to the Firebase node
-  List<Map<String, dynamic>> _parkingLots = [
+  List<Map<String, dynamic>> parkingLots = [
     {
       'id': 'demo',
       'name': 'Demo Parking Lot',
@@ -90,7 +90,7 @@ class _SearchPageState extends State<SearchPage> {
 
   // Get parking slot data from the cloud
   void updateParkingSlots() async {
-    for (var lot in _parkingLots) {
+    for (var lot in parkingLots) {
       if (lot['id'] == 'dcs' || lot['id'] == 'demo') { // This line should not exist in release versions
         final id = 'demo'; // We only have the demo database for now, it should be final id = lot['id'];
         final slots = await getSlotAvailability(
@@ -106,7 +106,7 @@ class _SearchPageState extends State<SearchPage> {
 
   List<Map<String, dynamic>> get _filteredLots {
     final query = _controller.text.toLowerCase();
-    return _parkingLots.where((lot) {
+    return parkingLots.where((lot) {
       return lot['name'].toLowerCase().contains(query);
     }).toList();
   }

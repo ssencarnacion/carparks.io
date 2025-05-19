@@ -10,7 +10,7 @@ Future<Map<String, dynamic>> getSlotAvailability({
 
   int available = 0;
   int total = 0;
-  List<String> availableFields = [];
+  List<String> availableSlots = [];
 
   data.forEach((key, value) {
     if (key.toString().startsWith('slot')) {
@@ -18,13 +18,13 @@ Future<Map<String, dynamic>> getSlotAvailability({
       final distance = double.tryParse(value.toString()) ?? 0.0;
       if (distance >= 200) { // We interpret this as a slot being free (accounts for timeouts: 999cm)
         available++; // Count available slots
-        availableFields.add(key.toString()); // Track all available slots
+        availableSlots.add(key.toString()); // Track all available slots
       }
     }
   });
 
   return {
     'summary': '$available/$total',
-    'availableFields': availableFields,
+    'availableSlots': availableSlots,
   };
 }
